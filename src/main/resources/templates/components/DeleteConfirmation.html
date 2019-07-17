@@ -1,0 +1,10 @@
+<div>
+    <div class="alert alert-danger text-center" role="alert">記事を削除します。よろしいですか?</div>
+    <form action="/delete" method="post" th:object="${article}">
+        <div>
+            <input type="hidden" name="id" th:value="*{id}">
+        </div>
+        <button type="submit" class="btn btn-danger btn-block">削除</button>
+        <button type="button" class="btn btn-secondary btn-block">キャンセル</button>
+    </form>
+</div>
