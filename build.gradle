@@ -1,0 +1,51 @@
+plugins {
+	id 'org.springframework.boot' version '2.1.6.RELEASE'
+	id 'java'
+	id 'eclipse'
+	id 'maven'
+}
+
+apply plugin: 'io.spring.dependency-management'
+
+group = 'com.github.JhonnyBravo'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+repositories {
+	mavenCentral()
+	maven{url 'https://jitpack.io'}
+}
+
+dependencies {
+	compile 'org.springframework.boot:spring-boot-starter-data-jpa'
+	compile 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	compile 'org.springframework.boot:spring-boot-starter-web'
+	compile 'com.h2database:h2'
+	testCompile 'org.springframework.boot:spring-boot-starter-test'
+	testCompile 'junit:junit:4.12'
+}
+
+task sourcesJar(type: Jar, dependsOn: classes){
+    classifier='sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc){
+    classifier='javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts{
+    archives sourcesJar
+    archives javadocJar
+}
+
+javadoc{
+    options.charSet='UTF-8'
+    options.encoding='UTF-8'
+}
+
+tasks.withType(JavaCompile){
+    options.encoding='UTF-8'
+}
