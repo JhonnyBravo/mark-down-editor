@@ -1,0 +1,14 @@
+<nav class="navbar navbar-expand-md navbar-dark bg-dark">
+    <a class="navbar-brand" th:href="${brand.getUrl()}" th:text="${brand.getTitle()}">Title</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item" th:each="link : ${links}">
+                <a class="nav-link" th:href="${link.getUrl()}" th:text="${link.getTitle()}">Option Title</a>
+            </li>
+        </ul>
+    </div>
+</nav>
