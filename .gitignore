@@ -34,3 +34,8 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Java Script ###
+node_modules
+package-lock.json
+build
