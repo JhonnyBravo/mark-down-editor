@@ -26,6 +26,14 @@ dependencies {
 	testCompile 'junit:junit:4.12'
 }
 
+sourceSets{
+	main{
+		resources{
+			exclude "**/node_modules/**"
+		}
+	}
+}
+
 task sourcesJar(type: Jar, dependsOn: classes){
     classifier='sources'
     from sourceSets.main.allSource
