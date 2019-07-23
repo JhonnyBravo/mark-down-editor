@@ -1,0 +1,31 @@
+{
+  "name": "mark-down-editor",
+  "version": "1.0.0",
+  "description": "Spring Boot 版 Mark Down Editor",
+  "main": "build/libs/mark_down_editor.js",
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "type-check:watch": "npm run type-check -- --watch",
+    "build": "webpack"
+  },
+  "author": "Jhonny Bravo",
+  "devDependencies": {
+    "@babel/cli": "^7.5.5",
+    "@babel/core": "^7.5.5",
+    "@babel/plugin-proposal-class-properties": "^7.5.5",
+    "@babel/plugin-proposal-numeric-separator": "^7.2.0",
+    "@babel/plugin-proposal-object-rest-spread": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "@babel/preset-typescript": "^7.3.3",
+    "babel-loader": "^8.0.6",
+    "typescript": "^3.5.3",
+    "webpack": "^4.36.1",
+    "webpack-cli": "^3.3.6"
+  },
+  "dependencies": {
+    "bootstrap": "^4.3.1",
+    "jquery": "^3.4.1",
+    "marked": "^0.7.0",
+    "popper.js": "^1.15.0"
+  }
+}
