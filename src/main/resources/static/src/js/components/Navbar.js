@@ -25,7 +25,7 @@ export default {
     },
     methods: {
         getLinks() {
-            Axios.get("/resources/links")
+            Axios.get("/links")
                 .then(response => {
                     const data = response.data;
                     this.brand = data.brand;
