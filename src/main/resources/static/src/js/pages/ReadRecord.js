@@ -1,32 +1,27 @@
-import Axios from "axios";
 import Card from "../components/Card";
+import Rest from "../mixins/Rest";
 
 export default {
     template: `
     <div>
-        <card v-for="card in cards" :id="card.id" :title="card.title" :contents="card.contents" :key="card.id"></card>
+        <card v-for="data in fetchedData" :id="data.id" :title="data.title" :contents="data.contents" :key="data.id"></card>
     </div>
     `,
     components: {
         "card": Card
     },
+    mixins: [Rest],
     data() {
         return {
-            cards: []
+            fetchedData: []
         }
     },
     methods: {
-        getCards() {
-            Axios.get("/card/view")
-                .then(response => {
-                    this.cards = response.data;
-                })
-                .catch(error => {
-                    console.log(error);
-                });
+        findAll() {
+            this.getData("/articles", this);
         }
     },
     created() {
-        this.getCards();
+        this.findAll();
     }
 }
