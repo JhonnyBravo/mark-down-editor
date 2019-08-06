@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/resources")
 public class LinksController {
     private Links links;
 
@@ -16,6 +15,9 @@ public class LinksController {
         this.links.addLinks(new Link("New Article", "/edit"));
     }
 
+    /**
+     * @return links navbar へ渡すリンクデータのリストを返す。
+     */
     @RequestMapping(value = "/links", method = { RequestMethod.GET })
     @ResponseBody
     public Links getLinks() {
