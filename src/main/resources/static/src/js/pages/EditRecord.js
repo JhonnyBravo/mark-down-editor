@@ -1,7 +1,7 @@
-import Axios from "axios";
 import SingleInput from "../components/SingleInput";
 import MultipleInput from "../components/MultipleInput";
 import Markdown from "../mixins/Markdown";
+import Rest from "../mixins/Rest";
 
 export default {
     template: `
@@ -11,7 +11,7 @@ export default {
                 <single-input id="title" label="Title" v-model="title"></single-input>
                 <multiple-input id="contents" label="Contents" rows="10" v-model="contents"></multiple-input>
                 <input type="hidden" v-model="id">
-                <button type="button" class="btn btn-primary" v-on:click="postCard">Save</button>
+                <button type="button" class="btn btn-primary" v-on:click="save">Save</button>
                 <button type="button" class="btn btn-primary" v-on:click="clear">Clear</button>
             </form>
         </div>
@@ -22,12 +22,13 @@ export default {
         "single-input": SingleInput,
         "multiple-input": MultipleInput
     },
-    mixins: [Markdown],
+    mixins: [Markdown, Rest],
     data() {
         return {
             id: null,
             title: null,
-            contents: null
+            contents: null,
+            fetchedData: null
         }
     },
     methods: {
@@ -36,32 +37,11 @@ export default {
             this.title = null;
             this.contents = null;
         },
-        getCard(id) {
-            Axios.get(`/card/view/${id}`)
-                .then(response => {
-                    this.id = response.data.id;
-                    this.title = response.data.title;
-                    this.contents = response.data.contents;
-                })
-                .catch(error => {
-                    console.log(error);
-                });
+        findById(id) {
+            this.getData(`/articles/${id}`, this);
         },
-        postCard() {
-            Axios.post("/card/edit", {
-                id: this.id,
-                title: this.title,
-                contents: this.contents
-            })
-                .then(response => {
-                    console.log("登録しました。");
-                    window.alert("登録しました。");
-                    this.$router.push("/");
-                })
-                .catch(error => {
-                    console.log(error);
-                    window.alert(`エラーが発生しました。\n${error}`);
-                });
+        save() {
+            this.postData("/articles/edit", this);
         }
     },
     computed: {
@@ -79,11 +59,16 @@ export default {
         }
     },
     watch: {
-        "$route": "clear"
+        "$route": "clear",
+        fetchedData() {
+            this.id = this.fetchedData.id;
+            this.title = this.fetchedData.title;
+            this.contents = this.fetchedData.contents;
+        }
     },
     created() {
         if (this.$route.params.id) {
-            this.getCard(this.$route.params.id);
+            this.findById(this.$route.params.id);
         } else {
             this.id = 0;
         }
