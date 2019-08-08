@@ -9,7 +9,7 @@
         <!-- Bootstrap CSS -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
             integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-        <link rel="stylesheet" type="text/css" th:href="@{/src/main/css/mark_down_editor.css}">
+        <link rel="stylesheet" type="text/css" th:href="@{/src/css/mark_down_editor.css}">
 
         <title>Mark Down Editor</title>
     </head>
@@ -17,11 +17,14 @@
     <body>
         <div class="container">
             <header th:include="components/Navbar"></header>
-            <section th:include="components/Card"></section>
+            <section id="app">
+                <card th:each="card : ${cards}" th:id="${card.id}" th:title="${card.title}"
+                    th:contents="${card.contents}"></card>
+            </section>
         </div>
 
         <!-- Optional JavaScript -->
-        <script type="text/javascript" th:src="@{/build/view_record.bundle.js}"></script>
+        <script type="text/javascript" th:src="@{/src/js/dist/ReadRecord.bundle.js}"></script>
         <!-- jQuery first, then Popper.js, then Bootstrap JS -->
         <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
             integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
