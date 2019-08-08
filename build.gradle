@@ -30,6 +30,9 @@ sourceSets{
 	main{
 		resources{
 			exclude "**/node_modules/**"
+			exclude "**/*.json"
+			exclude "**/webpack.config.js"
+			exclude "**/.babelrc"
 		}
 	}
 }
