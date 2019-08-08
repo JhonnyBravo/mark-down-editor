@@ -28,7 +28,7 @@ public class ArticlesController {
         this.brand = new Link("Mark Down Editor", "/");
         this.links = new ArrayList<Link>();
 
-        this.links.add(new Link("新規作成", "/create"));
+        this.links.add(new Link("New Article", "/create"));
     }
 
     /**
@@ -70,7 +70,7 @@ public class ArticlesController {
      * @param mav     ModelAndView を注入する。
      * @return ModelAndView 記事の更新フォームを表示する。
      */
-    @RequestMapping(value = "/update/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/edit/{id}", method = RequestMethod.GET)
     public ModelAndView doGetUpdate(@PathVariable long id, @ModelAttribute Articles article, ModelAndView mav) {
         mav.setViewName("edit_record");
         mav.addObject("brand", brand);
