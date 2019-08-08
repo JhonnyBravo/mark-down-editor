@@ -9,7 +9,7 @@
         <!-- Bootstrap CSS -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
             integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-        <link rel="stylesheet" type="text/css" th:href="@{/src/main/css/mark_down_editor.css}">
+        <link rel="stylesheet" type="text/css" th:href="@{/src/css/mark_down_editor.css}">
 
         <title>Mark Down Editor</title>
     </head>
@@ -17,11 +17,18 @@
     <body>
         <div class="container">
             <header th:include="components/Navbar"></header>
-            <section th:replace="components/MdEditor"></section>
+            <section id="app"></section>
+            <section>
+                <form th:object="${article}">
+                    <input type="hidden" id="data-id" th:value="*{id}">
+                    <input type="hidden" id="data-title" th:value="*{title}">
+                    <input type="hidden" id="data-contents" th:value="*{contents}">
+                </form>
+            </section>
         </div>
 
         <!-- Optional JavaScript -->
-        <script type="text/javascript" th:src="@{/build/edit_record.bundle.js}"></script>
+        <script type="text/javascript" th:src="@{/src/js/dist/EditRecord.bundle.js}"></script>
         <!-- jQuery first, then Popper.js, then Bootstrap JS -->
         <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
             integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
