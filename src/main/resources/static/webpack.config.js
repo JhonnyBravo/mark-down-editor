@@ -1,25 +1,34 @@
-var path = require("path");
+const path = require("path");
 
 module.exports = {
     mode: "development",
     entry: {
-        "build/edit_record": "./src/main/ts/client/edit_record.ts",
-        "build/view_record": "./src/main/ts/client/view_record.ts"
+        "src/js/dist/EditRecord": "./src/js/pages/EditRecord.js",
+        "src/js/dist/ReadRecord": "./src/js/pages/ReadRecord.js"
     },
     output: {
         path: __dirname,
         filename: "[name].bundle.js"
     },
     resolve: {
-        extensions: [".ts", ".tsx", ".js", ".json"]
+        modules: [
+            path.join(__dirname, "src"),
+            "node_modules"
+        ],
+        extensions: [".js"],
+        alias: {
+            "vue$": "vue/dist/vue.esm.js"
+        }
     },
     module: {
         rules: [
             {
-                test: /\.(ts|js)x?$/,
+                test: "/\.js$/",
                 exclude: /node_modules/,
-                loader: "babel-loader"
+                use: {
+                    loader: "babel-loader"
+                }
             }
         ]
     }
-};
+}
