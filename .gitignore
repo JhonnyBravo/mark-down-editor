@@ -8,6 +8,7 @@ gradlew.bat
 !**/src/main/**
 !**/src/test/**
 bin
+connection.properties
 
 ### STS ###
 .apt_generated
@@ -34,3 +35,9 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Java Script ###
+node_modules
+package-lock.json
+build
+dist
