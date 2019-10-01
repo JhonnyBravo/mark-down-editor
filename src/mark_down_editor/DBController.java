@@ -6,282 +6,228 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import context_resource.ConnectionResource;
-import context_resource.StatementResource;
-import status_resource.Status;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import sql_resource.ConnectionResource;
+import sql_resource.CrudResource;
 
 /**
  * DB 操作を管理する為のコントローラ。
  */
-public class DBController extends Status {
-    private ConnectionResource cr;
-    private StatementResource sr;
+public class DBController extends ConnectionResource implements CrudResource<Articles> {
+    private final Logger logger;
 
     /**
-     * @param path DB の接続情報を記述したプロパティファイルのパスを指定する。
+     * @param property DB 接続時に使用する接続情報を納めた Map オブジェクトを指定する。
      */
-    public DBController(String path) {
-        this.cr = new ConnectionResource(path);
+    public DBController(Map<String, String> property) {
+        super(property);
+        logger = LoggerFactory.getLogger(this.getClass());
     }
 
     /**
-     * @return List&lt;Articles&gt; DB に登録されている全記事を納めたリストを返す。
+     * @return recordset DB に登録されている全記事を納めたリストを返す。
+     * @throws Exception {@link java.lang.Exception}
      */
-    public List<Articles> findAll() {
-        ResultSet rs = null;
-        List<Articles> list = new ArrayList<Articles>();
-        this.initStatus();
+    @Override
+    public List<Articles> findAll() throws Exception {
+        logger.info("DB へ接続しています......");
+        final List<Articles> recordset = new ArrayList<Articles>();
+        final Connection cn = getConnection();
 
-        cr.openContext();
-        this.setCode(cr.getCode());
-
-        if (this.getCode() == 1) {
-            return list;
-        }
-
-        Connection connection = (Connection) cr.getContext();
-        String sql = "SELECT * FROM articles;";
-
-        this.sr = new StatementResource(connection, sql);
-        sr.openContext();
-        this.setCode(sr.getCode());
-
-        if (this.getCode() == 1) {
-            cr.closeContext();
-            return list;
-        }
-
-        PreparedStatement statement = (PreparedStatement) sr.getContext();
-        long count = 0;
-
-        try {
-            rs = statement.executeQuery();
-
+        logger.info("レコードを取得しています......");
+        try (PreparedStatement query = cn.prepareStatement("SELECT * FROM articles;");
+                ResultSet rs = query.executeQuery();) {
             while (rs.next()) {
-                Articles articles = new Articles();
+                final Articles record = new Articles();
 
-                articles.setId(rs.getLong("id"));
-                articles.setTitle(rs.getString("title"));
-                articles.setContents(rs.getString("contents"));
+                record.setId(rs.getLong("id"));
+                record.setTitle(rs.getString("title"));
+                record.setContents(rs.getString("contents"));
 
-                list.add(articles);
-                count++;
+                recordset.add(record);
             }
-
-            if (count > 0) {
-                this.setCode(2);
-            } else {
-                this.initStatus();
-            }
-        } catch (SQLException e) {
-            this.setCode(1);
-            this.errorTerminate("エラーが発生しました。 " + e);
         } finally {
-            sr.closeContext();
-            cr.closeContext();
+            cn.close();
         }
 
-        return list;
+        return recordset;
     }
 
     /**
+     * ID をキーに記事を検索する。
+     *
      * @param id 検索対象とする記事の id 番号を指定する。
      * @return Articles 指定した id に該当する記事を取得して返す。
+     * @throws SQLException {@link java.sql.SQLException}
      */
-    public Articles findById(long id) {
+    public Articles findById(long id) throws SQLException {
+        logger.info("DB へ接続しています......");
+        final Connection cn = getConnection();
         ResultSet rs = null;
-        Articles result = null;
-        this.initStatus();
+        final Articles record = new Articles();
 
-        cr.openContext();
-        this.setCode(cr.getCode());
-
-        if (this.getCode() == 1) {
-            return result;
-        }
-
-        Connection connection = (Connection) cr.getContext();
-        String sql = "SELECT * FROM articles WHERE id=?;";
-
-        this.sr = new StatementResource(connection, sql);
-        sr.openContext();
-        this.setCode(sr.getCode());
-
-        if (this.getCode() == 1) {
-            cr.closeContext();
-            return result;
-        }
-
-        PreparedStatement statement = (PreparedStatement) sr.getContext();
-
-        try {
-            statement.setLong(1, id);
-            rs = statement.executeQuery();
+        logger.info("レコードを取得しています......");
+        try (PreparedStatement query = cn.prepareStatement("SELECT * FROM articles WHERE id=?;");) {
+            query.setLong(1, id);
+            rs = query.executeQuery();
 
             if (rs.next()) {
-                result = new Articles();
-                result.setId(rs.getLong("id"));
-                result.setTitle(rs.getString("title"));
-                result.setContents(rs.getString("contents"));
-
-                this.setCode(2);
+                record.setId(rs.getLong("id"));
+                record.setTitle(rs.getString("title"));
+                record.setContents(rs.getString("contents"));
             }
-        } catch (SQLException e) {
-            this.setCode(1);
-            this.errorTerminate("エラーが発生しました。 " + e);
         } finally {
-            sr.closeContext();
-            cr.closeContext();
+            if (rs != null) {
+                rs.close();
+            }
+
+            cn.close();
         }
 
-        return result;
+        return record;
     }
 
     /**
-     * 記事を DB へ新規登録する。
-     * 
-     * @param articles 登録対象とする Articles を指定する。
+     * DB へ記事を新規登録する。
+     *
+     * @param model 登録対象とするモデルオブジェクトを指定する。
+     * @return status
+     *         <ul>
+     *         <li>true: 記事の登録に成功したことを表す。</li>
+     *         <li>false: 記事の登録に失敗したことを表す。</li>
+     *         </ul>
      */
-    public void create(Articles articles) {
-        this.initStatus();
+    @Override
+    public boolean create(Articles model) throws Exception {
+        logger.info("DB へ接続しています......");
+        boolean status = false;
+        final Connection cn = getConnection();
 
-        cr.openContext();
-        this.setCode(cr.getCode());
+        logger.info("新規レコードを登録しています......");
+        try (PreparedStatement query = cn.prepareStatement("INSERT INTO articles (title, contents) VALUES(?, ?);")) {
+            cn.setAutoCommit(false);
 
-        if (this.getCode() == 1) {
-            return;
-        }
+            query.setString(1, model.getTitle());
+            query.setString(2, model.getContents());
+            query.execute();
 
-        Connection connection = (Connection) cr.getContext();
-        cr.disableAutoCommit();
-
-        String sql = "INSERT INTO articles (title,contents) VALUES(?,?);";
-
-        this.sr = new StatementResource(connection, sql);
-        sr.openContext();
-        this.setCode(sr.getCode());
-
-        if (this.getCode() == 1) {
-            cr.enableAutoCommit();
-            cr.closeContext();
-            return;
-        }
-
-        PreparedStatement statement = (PreparedStatement) sr.getContext();
-
-        try {
-            statement.setString(1, articles.getTitle());
-            statement.setString(2, articles.getContents());
-            statement.execute();
-            cr.commit();
-            this.setCode(2);
-        } catch (SQLException e) {
-            this.setCode(1);
-            this.errorTerminate("エラーが発生しました。 " + e);
-            cr.rollback();
+            cn.commit();
+            status = true;
+        } catch (final Exception e) {
+            cn.rollback();
+            throw e;
         } finally {
-            cr.enableAutoCommit();
-            sr.closeContext();
-            cr.closeContext();
+            cn.close();
         }
+
+        return status;
     }
 
     /**
-     * DB に登録されている既存記事を更新する。
-     * 
-     * @param articles 更新対象とする Articles を指定する。
+     * DB に登録されている記事を更新する。
+     *
+     * @param model 更新対象データを納めたモデルオブジェクトを指定する。
+     * @return status
+     *         <ul>
+     *         <li>true: 記事の更新に成功したことを表す。</li>
+     *         <li>false: 記事の更新に失敗したことを表す。</li>
+     *         </ul>
      */
-    public void updateById(Articles articles) {
-        this.initStatus();
+    @Override
+    public boolean update(Articles model) throws Exception {
+        logger.info("DB へ接続しています......");
+        boolean status = false;
+        final Connection cn = getConnection();
 
-        cr.openContext();
-        this.setCode(cr.getCode());
+        logger.info("レコードを更新しています......");
+        try (PreparedStatement query = cn.prepareStatement("UPDATE articles SET title=?, contents=? WHERE id=?;")) {
+            cn.setAutoCommit(false);
 
-        if (this.getCode() == 1) {
-            return;
-        }
+            query.setString(1, model.getTitle());
+            query.setString(2, model.getContents());
+            query.setLong(3, model.getId());
+            query.execute();
 
-        Connection connection = (Connection) cr.getContext();
-        cr.disableAutoCommit();
-
-        String sql = "UPDATE articles SET title=?,contents=? WHERE id=?;";
-
-        this.sr = new StatementResource(connection, sql);
-        sr.openContext();
-        this.setCode(sr.getCode());
-
-        if (this.getCode() == 1) {
-            cr.enableAutoCommit();
-            cr.closeContext();
-            return;
-        }
-
-        PreparedStatement statement = (PreparedStatement) sr.getContext();
-
-        try {
-            statement.setString(1, articles.getTitle());
-            statement.setString(2, articles.getContents());
-            statement.setLong(3, articles.getId());
-            statement.execute();
-            cr.commit();
-            this.setCode(2);
-        } catch (SQLException e) {
-            this.setCode(1);
-            this.errorTerminate("エラーが発生しました。 " + e);
-            cr.rollback();
+            cn.commit();
+            status = true;
+        } catch (final Exception e) {
+            cn.rollback();
+            throw e;
         } finally {
-            cr.enableAutoCommit();
-            sr.closeContext();
-            cr.closeContext();
+            cn.close();
         }
+
+        return status;
     }
 
     /**
-     * DB に登録されている記事を削除する。
-     * 
-     * @param id 削除対象とする記事の id 番号を指定する。
+     * ID をキーに DB に登録されている記事を削除する。
+     *
+     * @param model 削除情報を納めたモデルオブジェクトを指定する。
+     * @return status
+     *         <ul>
+     *         <li>true: 記事の削除に成功したことを表す。</li>
+     *         <li>false: 記事の削除に失敗したことを表す。</li>
+     *         </ul>
      */
-    public void deleteById(long id) {
-        this.initStatus();
+    @Override
+    public boolean delete(Articles model) throws Exception {
+        logger.info("DB へ接続しています......");
+        boolean status = false;
+        final Connection cn = getConnection();
 
-        cr.openContext();
-        this.setCode(cr.getCode());
+        logger.info("レコードを削除しています......");
+        try (PreparedStatement query = cn.prepareStatement("DELETE FROM articles WHERE id=?;")) {
+            cn.setAutoCommit(false);
 
-        if (this.getCode() == 1) {
-            return;
-        }
+            query.setLong(1, model.getId());
+            query.execute();
 
-        Connection connection = (Connection) cr.getContext();
-        cr.disableAutoCommit();
-
-        String sql = "DELETE FROM articles WHERE id=?;";
-
-        this.sr = new StatementResource(connection, sql);
-        sr.openContext();
-        this.setCode(sr.getCode());
-
-        if (this.getCode() == 1) {
-            cr.enableAutoCommit();
-            cr.closeContext();
-            return;
-        }
-
-        PreparedStatement statement = (PreparedStatement) sr.getContext();
-
-        try {
-            statement.setLong(1, id);
-            statement.execute();
-            cr.commit();
-            this.setCode(2);
-        } catch (SQLException e) {
-            this.setCode(1);
-            this.errorTerminate("エラーが発生しました。 " + e);
-            cr.rollback();
+            cn.commit();
+            status = true;
+        } catch (final Exception e) {
+            cn.rollback();
+            throw e;
         } finally {
-            cr.enableAutoCommit();
-            sr.closeContext();
-            cr.closeContext();
+            cn.close();
         }
+
+        return status;
+    }
+
+    /**
+     * DB に登録されている全記事を削除する。
+     *
+     * @return status
+     *         <ul>
+     *         <li>true: 記事の削除に成功したことを表す。</li>
+     *         <li>false: 記事の削除に失敗したことを表す。</li>
+     *         </ul>
+     */
+    @Override
+    public boolean deleteAll() throws Exception {
+        logger.info("DB へ接続しています......");
+        boolean status = false;
+        final Connection cn = getConnection();
+
+        logger.info("レコードを削除しています......");
+        try (PreparedStatement query = cn.prepareStatement("DELETE FROM articles;")) {
+            cn.setAutoCommit(false);
+            query.execute();
+            cn.commit();
+
+            status = true;
+        } catch (final Exception e) {
+            cn.rollback();
+            throw e;
+        } finally {
+            cn.close();
+        }
+
+        return status;
     }
 }
