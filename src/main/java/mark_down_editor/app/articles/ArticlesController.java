@@ -1,8 +1,7 @@
-package mark_down_editor;
+package mark_down_editor.app.articles;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
@@ -13,7 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
 
-import property_resource.PropertyResource;
+import mark_down_editor.domain.model.Articles;
+import mark_down_editor.domain.service.articles.ArticlesService;
 
 /**
  * 記事の管理を行う為の REST API コントローラ。
@@ -21,19 +21,15 @@ import property_resource.PropertyResource;
 @WebServlet("/articles")
 public class ArticlesController extends HttpServlet {
     private static final long serialVersionUID = 1L;
-    private final DBController dbc;
+
+    private final ArticlesHelper helper;
+    private final ArticlesService service;
     private final Gson gson;
 
-    /**
-     * @throws Exception {@link java.lang.Exception}
-     * @see HttpServlet#HttpServlet()
-     */
     public ArticlesController() throws Exception {
         super();
-        final PropertyResource pr = new PropertyResource("WebContent/WEB-INF/classes/connection.properties");
-        final Map<String, String> properties = pr.getContent();
-
-        dbc = new DBController(properties);
+        helper = new ArticlesHelper();
+        service = helper.getArticlesService("WebContent/WEB-INF/classes/connection.properties");
         gson = new Gson();
     }
 
@@ -43,7 +39,7 @@ public class ArticlesController extends HttpServlet {
      * @param request  REST クライアントから送信された Get パラメータ
      * @param response REST クライアントへ返す JSON データ
      * @throws ServletException {@link javax.servlet.ServletException}
-     * @throws IOException      {@link java.io.Exception}
+     * @throws IOException      {@link java.io.IOException}
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -53,10 +49,10 @@ public class ArticlesController extends HttpServlet {
         try {
             if (request.getParameterMap().containsKey("id")) {
                 final long id = Long.parseLong(request.getParameter("id"));
-                final Articles articles = dbc.findById(id);
+                final Articles articles = service.findById(id);
                 json = gson.toJson(articles);
             } else {
-                final List<Articles> articles = dbc.findAll();
+                final List<Articles> articles = service.findAll();
                 json = gson.toJson(articles);
             }
         } catch (final Exception e) {
@@ -70,11 +66,11 @@ public class ArticlesController extends HttpServlet {
 
     /**
      * 記事を DB へ新規登録する。
-     * 
+     *
      * @param request  REST クライアントから送信された JSON データ
      * @param response REST クライアントへ返すステータス(未実装)
      * @throws ServletException {@link javax.servlet.ServletException}
-     * @throws IOException      {@link java.io.Exception}
+     * @throws IOException      {@link java.io.IOException}
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -83,7 +79,7 @@ public class ArticlesController extends HttpServlet {
         final Articles articles = gson.fromJson(json, Articles.class);
 
         try {
-            dbc.create(articles);
+            service.create(articles);
         } catch (final Exception e) {
             throw new IOException(e);
         }
@@ -95,7 +91,7 @@ public class ArticlesController extends HttpServlet {
      * @param request  REST クライアントから送信された JSON データ
      * @param response REST クライアントへ返すステータス(未実装)
      * @throws ServletException {@link javax.servlet.ServletException}
-     * @throws IOException      {@link java.io.Exception}
+     * @throws IOException      {@link java.io.IOException}
      */
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response)
@@ -104,7 +100,7 @@ public class ArticlesController extends HttpServlet {
         final Articles articles = gson.fromJson(json, Articles.class);
 
         try {
-            dbc.update(articles);
+            service.update(articles);
         } catch (final Exception e) {
             throw new IOException(e);
         }
@@ -112,11 +108,11 @@ public class ArticlesController extends HttpServlet {
 
     /**
      * DB に登録されている記事を削除する。
-     * 
+     *
      * @param request  REST クライアントから送信された JSON データ
      * @param response REST クライアントへ返すステータス(未実装)
      * @throws ServletException {@link javax.servlet.ServletException}
-     * @throws IOException      {@link java.io.Exception}
+     * @throws IOException      {@link java.io.IOException}
      */
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response)
@@ -127,7 +123,7 @@ public class ArticlesController extends HttpServlet {
         articles.setId(id);
 
         try {
-            dbc.delete(articles);
+            service.delete(articles);
         } catch (final Exception e) {
             throw new IOException(e);
         }
