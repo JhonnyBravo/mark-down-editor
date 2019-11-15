@@ -1,4 +1,4 @@
-package mark_down_editor;
+package mark_down_editor.domain.model;
 
 /**
  * 記事を永続化する為のエンティティ。
