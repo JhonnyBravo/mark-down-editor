@@ -40,8 +40,7 @@ dependencies {
     compile "org.apache.tomcat:tomcat-servlet-api:${tomcatVersion}"
     compile "org.apache.tomcat:tomcat-jsp-api:${tomcatVersion}"
 
-    compile 'com.github.JhonnyBravo:property-resource:master-SNAPSHOT'
-    compile 'com.github.JhonnyBravo:sql-resource:master-SNAPSHOT'
+    compile 'com.github.JhonnyBravo:java-itamae-connection:master-SNAPSHOT'
     compile group: 'com.google.code.gson', name: 'gson', version: '2.8.5'
     testCompile 'junit:junit:4.12'
 }
@@ -87,11 +86,21 @@ project.webAppDirName = 'WebContent'
 sourceSets {
     main {
         java {
-            srcDir 'src'
+            srcDir 'src/main/java'
         }
 
         resources {
-            srcDir 'src'
+            srcDir 'src/main/resources'
+        }
+    }
+    
+    test{
+        java{
+            srcDir 'src/test/java'
+        }
+        
+        resources{
+            srcDir 'src/test/resources'
         }
     }
 }
