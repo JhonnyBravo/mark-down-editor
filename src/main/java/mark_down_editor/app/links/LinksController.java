@@ -1,4 +1,4 @@
-package mark_down_editor;
+package mark_down_editor.app.links;
 
 import java.io.IOException;
 
@@ -9,6 +9,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
+
+import mark_down_editor.domain.model.Link;
+import mark_down_editor.domain.model.Links;
 
 /**
  * リンクデータをクライアントへ送信する為の REST API コントローラ。
