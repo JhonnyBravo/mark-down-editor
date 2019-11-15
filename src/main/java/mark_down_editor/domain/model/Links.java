@@ -1,4 +1,4 @@
-package mark_down_editor;
+package mark_down_editor.domain.model;
 
 import java.util.ArrayList;
 import java.util.List;
