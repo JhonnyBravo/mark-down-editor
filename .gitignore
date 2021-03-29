@@ -9,6 +9,9 @@ gradlew.bat
 !**/src/test/**
 bin
 
+### H2 ###
+*.mv.db
+
 ### STS ###
 .apt_generated
 .classpath
