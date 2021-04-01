@@ -1,4 +1,4 @@
-package mark_down_editor;
+package mark_down_editor.domain.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
