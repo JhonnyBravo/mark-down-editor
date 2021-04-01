@@ -1,9 +1,12 @@
-package mark_down_editor;
+package mark_down_editor.app.links;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import mark_down_editor.domain.model.Link;
+import mark_down_editor.domain.model.Links;
 
 @RestController
 public class LinksController {
