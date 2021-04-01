@@ -1,10 +1,8 @@
-package mark_down_editor;
+package mark_down_editor.app.articles;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,13 +10,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import mark_down_editor.domain.model.Articles;
+import mark_down_editor.domain.service.articles.ArticlesService;
+
 /**
  * 記事の閲覧と登録・更新・削除を実行する。
  */
 @RestController
 public class ArticlesController {
     @Autowired
-    private ArticlesRepository repository;
+    private ArticlesService service;
 
     /**
      * @return List&lt;Articles&gt; 登録されている全記事の一覧を JSON 形式で返す。
@@ -26,7 +27,7 @@ public class ArticlesController {
     @RequestMapping(value = "/articles", method = RequestMethod.GET)
     @ResponseBody
     public List<Articles> findAll() {
-        List<Articles> articles = repository.findAll();
+        final List<Articles> articles = service.findAll();
         return articles;
     }
 
@@ -35,8 +36,8 @@ public class ArticlesController {
      * @return Optional&lt;Articles&gt; 条件に合致する記事を取得し、 JSON 形式で返す。
      */
     @RequestMapping(value = "/articles/{id}", method = RequestMethod.GET)
-    public Optional<Articles> findById(@PathVariable long id) {
-        Optional<Articles> articles = repository.findById(id);
+    public Articles findById(@PathVariable long id) {
+        final Articles articles = service.findById(id);
         return articles;
     }
 
@@ -44,17 +45,15 @@ public class ArticlesController {
      * @param article 登録または更新の対象とする Articles エンティティを指定する。
      */
     @RequestMapping(value = "/articles/edit", method = RequestMethod.POST)
-    @Transactional(readOnly = false)
     public void edit(@RequestBody Articles article) {
-        repository.saveAndFlush(article);
+        service.edit(article);
     }
 
     /**
      * @param article 削除対象とする Articles エンティティを指定する。
      */
     @RequestMapping(value = "/articles/delete", method = RequestMethod.POST)
-    @Transactional(readOnly = false)
     public void delete(@RequestBody Articles article) {
-        repository.delete(article);
+        service.delete(article);
     }
 }
