@@ -8,6 +8,7 @@ gradlew.bat
 !**/src/main/**
 !**/src/test/**
 bin
+*.mv.db
 
 ### STS ###
 .apt_generated
