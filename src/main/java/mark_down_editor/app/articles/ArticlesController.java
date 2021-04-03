@@ -1,12 +1,10 @@
-package mark_down_editor;
+package mark_down_editor.app.articles;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,19 +12,23 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import mark_down_editor.domain.model.Articles;
+import mark_down_editor.domain.model.Link;
+import mark_down_editor.domain.service.articles.ArticlesService;
+
 /**
  * 記事の閲覧と登録・更新・削除を実行する。
  */
 @Controller
 public class ArticlesController {
     @Autowired
-    private ArticlesRepository repository;
-    private Link brand;
-    private List<Link> links;
+    private ArticlesService service;
+    private final Link brand;
+    private final List<Link> links;
 
     public ArticlesController() {
         this.brand = new Link("Mark Down Editor", "/");
-        this.links = new ArrayList<Link>();
+        this.links = new ArrayList<>();
 
         this.links.add(new Link("New Article", "/create"));
     }
@@ -42,7 +44,7 @@ public class ArticlesController {
         mav.addObject("brand", brand);
         mav.addObject("links", links);
 
-        List<Articles> cards = repository.findAll();
+        final List<Articles> cards = service.findAll();
         mav.addObject("cards", cards);
 
         return mav;
@@ -76,8 +78,8 @@ public class ArticlesController {
         mav.addObject("brand", brand);
         mav.addObject("links", links);
 
-        Optional<Articles> data = repository.findById(id);
-        mav.addObject("article", data.get());
+        final Articles data = service.findById(id);
+        mav.addObject("article", data);
 
         return mav;
     }
@@ -94,8 +96,8 @@ public class ArticlesController {
         mav.addObject("brand", brand);
         mav.addObject("links", links);
 
-        Optional<Articles> data = repository.findById(id);
-        mav.addObject("article", data.get());
+        final Articles data = service.findById(id);
+        mav.addObject("article", data);
 
         return mav;
     }
@@ -106,9 +108,8 @@ public class ArticlesController {
      * @return ModelAndView 記事の一覧ページへリダイレクトする。
      */
     @RequestMapping(value = "/edit", method = RequestMethod.POST)
-    @Transactional(readOnly = false)
     public ModelAndView doPostEdit(@ModelAttribute Articles article, ModelAndView mav) {
-        repository.saveAndFlush(article);
+        service.edit(article);
         return new ModelAndView("redirect:/");
     }
 
@@ -118,9 +119,9 @@ public class ArticlesController {
      * @return ModelAndView 記事の一覧ページへリダイレクトする。
      */
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
-    @Transactional(readOnly = false)
     public ModelAndView doPostDelete(@RequestParam long id, ModelAndView mav) {
-        repository.deleteById(id);
+        final Articles articles = service.findById(id);
+        service.delete(articles);
         return new ModelAndView("redirect:/");
     }
 }
