@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * アプリケーションを起動する。
  */
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "mark_down_editor")
 public class MarkDownEditorApplication {
 
     public static void main(String[] args) {
