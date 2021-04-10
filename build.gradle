@@ -1,8 +1,8 @@
 plugins {
-	id 'org.springframework.boot' version '2.4.4'
-	id 'java'
-	id 'eclipse'
-	id 'maven'
+    id 'org.springframework.boot' version '2.4.4'
+    id 'java'
+    id 'eclipse'
+    id 'maven-publish'
 }
 
 apply plugin: 'io.spring.dependency-management'
@@ -13,28 +13,28 @@ sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
 repositories {
-	mavenCentral()
-	maven{url 'https://jitpack.io'}
+    mavenCentral()
+    maven{url 'https://jitpack.io'}
 }
 
 dependencies {
-	compile 'org.springframework.boot:spring-boot-starter-data-jpa'
-	compile 'org.springframework.boot:spring-boot-starter-thymeleaf'
-	compile 'org.springframework.boot:spring-boot-starter-web'
-	compile 'com.h2database:h2'
-	testCompile 'org.springframework.boot:spring-boot-starter-test'
-	testCompile 'junit:junit:4.13.2'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'com.h2database:h2'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'junit:junit:4.13.2'
 }
 
 sourceSets{
-	main{
-		resources{
-			exclude "**/node_modules/**"
-			exclude "**/*.json"
-			exclude "**/webpack.config.js"
-			exclude "**/.babelrc"
-		}
-	}
+    main{
+        resources{
+            exclude "**/node_modules/**"
+            exclude "**/*.json"
+            exclude "**/webpack.config.js"
+            exclude "**/.babelrc"
+        }
+    }
 }
 
 task sourcesJar(type: Jar, dependsOn: classes){
@@ -59,4 +59,8 @@ javadoc{
 
 tasks.withType(JavaCompile){
     options.encoding='UTF-8'
+}
+
+bootJar {
+    launchScript()
 }
