@@ -9,8 +9,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication(scanBasePackages = "mark_down_editor")
 public class MarkDownEditorApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(MarkDownEditorApplication.class, args);
-    }
+  public static void main(String[] args) {
+    SpringApplication.run(MarkDownEditorApplication.class, args);
+  }
 
 }
