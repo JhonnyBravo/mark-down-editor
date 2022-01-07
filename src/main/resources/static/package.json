@@ -19,7 +19,7 @@
     "axios": "^0.21.1",
     "bootstrap": "^5.0.1",
     "jquery": "^3.4.1",
-    "marked": "^2.0.1",
+    "marked": "^4.0.9",
     "popper.js": "^1.15.0",
     "vue": "^2.6.10",
     "vue-router": "^3.0.7"
